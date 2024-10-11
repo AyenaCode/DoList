@@ -3,14 +3,19 @@ const addButton = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
 const counter = document.getElementById("count");
 
-const taskTab = [];
+let taskTab = [];
 
 // Ajouter une tâche avec les boutons "Terminé" et "Supprimer"
 addButton.addEventListener("click", () => {
   if (input.value === "") {
     alert("Veuillez entrer une tâche");
   } else {
-    taskTab.push(input.value);
+    const newTask = {
+      id: Date.now(),
+      title: input.value,
+      completed: false,
+    };
+    taskTab.push(newTask);
     input.value = "";
     displayTask();
   }
@@ -27,32 +32,42 @@ function displayTask() {
     const taskDiv = document.createElement("div");
     taskDiv.classList.add("task");
     taskDiv.innerHTML = `
-      <p>${index + 1}-) ${task}</p>
-      <button id="doneBtn" onclick="taskDone(${index})">Terminé</button>
-      <button id="delete" onclick="removeTask(${index})">Supprimer</button>
+      <p class="${task.completed ? "done" : ""}">${index + 1}-) ${
+      task.title
+    }</p>
+      <button id="doneBtn" onclick="taskDone(${task.id})">Terminé</button>
+      <button onclick="removeTask(${task.id})">Supprimer</button>
     `;
     taskList.appendChild(taskDiv);
   });
-  counter.textContent = `Vous avez ${taskTab.length} tâches`;
+  updateCounter();
 }
 
 /**
  * Supprimer une tâche
- * @param {number} index
+ * @param {number} id
  */
-function removeTask(index) {
-  taskTab.splice(index, 1);
+function removeTask(id) {
+  taskTab = taskTab.filter((task) => task.id !== id);
   displayTask();
 }
+
 /**
  * Marquer une tâche comme terminée
- * @param {number} index
+ * @param {number} id
  */
-function taskDone(index) {
-  taskList.children[index].firstElementChild.classList.toggle("done");
-  // Mettre à jour le compteur en diminuant le nombre de tâches
-  const doneTasks = taskList.querySelectorAll(".done").length;
-  counter.textContent = `Vous avez ${
-    taskTab.length - doneTasks
-  } tâches restantes`;
+function taskDone(id) {
+  const task = taskTab.find((task) => task.id === id);
+  if (task) {
+    task.completed = !task.completed;
+  }
+  displayTask();
+}
+
+/**
+ * Mettre à jour le compteur de tâches
+ */
+function updateCounter() {
+  const remainingTasks = taskTab.filter((task) => !task.completed).length;
+  counter.textContent = `Vous avez ${remainingTasks} tâches restantes`;
 }
