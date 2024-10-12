@@ -12,10 +12,10 @@ class TaskManager {
   private taskTab: Task[];
 
   constructor() {
-    this.input = document.getElementById("task") as HTMLInputElement;
-    this.addButton = document.getElementById("addBtn") as HTMLButtonElement;
-    this.taskList = document.getElementById("taskList") as HTMLElement;
-    this.counter = document.getElementById("count") as HTMLElement;
+    this.input = document.querySelector("#task") as HTMLInputElement;
+    this.addButton = document.querySelector("#addBtn") as HTMLButtonElement;
+    this.taskList = document.querySelector("#taskList") as HTMLElement;
+    this.counter = document.querySelector("#count") as HTMLElement;
     this.taskTab = [];
 
     if (this.addButton) {
@@ -24,12 +24,12 @@ class TaskManager {
   }
 
   private addTask(): void {
-    if (this.input.value === "") {
+    if (this.input.value.trim() === "") {
       alert("Veuillez entrer une tâche");
     } else {
       const newTask: Task = {
         id: Date.now(),
-        title: this.input.value,
+        title: this.input.value.trim(),
         completed: false,
       };
       this.taskTab.push(newTask);
@@ -47,9 +47,15 @@ class TaskManager {
         <p class="${task.completed ? "done" : ""}">${index + 1}-) ${
         task.title
       }</p>
-        <button onclick="taskManager.taskDone(${task.id})">Terminé</button>
-        <button onclick="taskManager.removeTask(${task.id})">Supprimer</button>
+        <button class="doneBtn">Terminé</button>
+        <button class="removeBtn">Supprimer</button>
       `;
+      taskDiv
+        .querySelector(".doneBtn")
+        ?.addEventListener("click", () => this.taskDone(task.id));
+      taskDiv
+        .querySelector(".removeBtn")
+        ?.addEventListener("click", () => this.removeTask(task.id));
       this.taskList.appendChild(taskDiv);
     });
     this.updateCounter();
